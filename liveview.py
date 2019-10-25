@@ -4,6 +4,14 @@ from kivy.uix.widget import Widget
 from math import sin
 
 class LiveView(Widget):
+    def __init__(self, **kwargs):
+        super().__init__()
+        self.graph = Graph(x_ticks_minor=5,
+            x_ticks_major=25, y_ticks_major=1,
+            y_grid_label=True, x_grid_label=True, padding=5,
+            x_grid=True, y_grid=True, xmin=-0, xmax=100, ymin=-1, ymax=1, **kwargs)
+        self.register()
+
     def create_callback(self):
         self.i = 0
         self.plot = MeshLinePlot(color=[1, 0, 0, 1])
@@ -28,8 +36,3 @@ class LiveView(Widget):
     def register(self):
         # call my_callback every 0.5 seconds
         Clock.schedule_interval(self.create_callback(), 0.05)
-
-    graph = Graph(xlabel='X', ylabel='Y', x_ticks_minor=5,
-    x_ticks_major=25, y_ticks_major=1,
-    y_grid_label=True, x_grid_label=True, padding=5,
-    x_grid=True, y_grid=True, xmin=-0, xmax=100, ymin=-1, ymax=1)
