@@ -9,9 +9,15 @@ import json
 from threading import Thread
 import broker_util
 import requests
+from color_util import UserLightStatus
 
 class SpannungsteilerApp(App):
     def build(self):
+        self.demand = 0
+        self.supply = 0
+        self.fill = 0
+        self.user_status_lights = UserLightStatus()
+
         full = GridLayout(rows=3, row_default_height=30, row_force_default=False)
         full.add_widget(Label(text='Overview', size_hint_y=None, height=20))
 
@@ -29,14 +35,32 @@ class SpannungsteilerApp(App):
         full.add_widget(layout)
 
         actions = GridLayout(cols=3, size_hint_y=None, height=50)
-        actions.add_widget(Button(text="Sell"))
-        actions.add_widget(Button(text="Buy"))
-        actions.add_widget(Button(text="Donate"))
+        sell_button = Button(text="Sell")
+        sell_button.bind(on_press=self.click())
+        actions.add_widget(sell_button)
+        buy_button = Button(text="Buy")
+        buy_button.bind(on_press=self.click())
+        actions.add_widget(buy_button)
+        donate_button = Button(text="Donate")
+        donate_button.bind(on_press=self.click())
+        actions.add_widget(donate_button)
         full.add_widget(actions)
 
         return full
 
+    def click(self):
+        def callback(instance):
+            print("click")
+        return callback
+
     def update(self, json):
+        if self.demand > self.supply:
+            color = "red"
+        else:
+            color = "green"
+
+        self.user_status_lights.update_user(0, color)
+
         self.liveview1.update(json)
 
 if __name__ == '__main__':
