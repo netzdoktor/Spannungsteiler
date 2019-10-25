@@ -20,3 +20,18 @@ def send(send_type, payload):
 
     response = requests.request("POST", url, data=json_payload, headers=headers)
     return response
+
+
+def send_demand(sender, timestamp, value):
+
+    payload={
+        "type": "demand_publisher",
+        "sender": sender,
+        "payload": {
+            "timestamp": timestamp,
+            "value": value
+        } 
+    }
+
+    send("publish", payload)
+  
