@@ -7,18 +7,20 @@ class LiveView(Widget):
     def create_callback(self):
         self.i = 0
         self.plot = MeshLinePlot(color=[1, 0, 0, 1])
-        self.points = [0 for x in range(0,101)]
+        self.plot.points = [(x,0) for x in range(0,101)]
         self.graph.add_plot(self.plot)
 
-        def my_callback(dt):
-            self.plot.points = [(x, sin((x+self.i) / 10.)) for x in range(0, 101)]
+        def callback(dt):
+            self.plot.points[self.i] = (self.i, sin((self.i) / 10.))
             self.i += 1
+            if self.i > 100:
+                self.i = 0
 
-        return my_callback
+        return callback
 
     def register(self):
         # call my_callback every 0.5 seconds
-        Clock.schedule_interval(self.create_callback(), 0.5)
+        Clock.schedule_interval(self.create_callback(), 0.05)
 
     graph = Graph(xlabel='X', ylabel='Y', x_ticks_minor=5,
     x_ticks_major=25, y_ticks_major=1,
