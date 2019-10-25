@@ -9,12 +9,14 @@ class SpannungsteilerApp(App):
     def build(self):
         layout = GridLayout(cols=2, row_force_default=True, row_default_height=300)
 
-        liveview = LiveView().graph
+        liveview = LiveView()
+        liveview.register()
+
 
         layout.add_widget(Button(text='Hello 1', size_hint_x=None, width=100))
         layout.add_widget(Button(text='World 1'))
         layout.add_widget(Button(text='Hello 2', size_hint_x=None, width=100))
-        layout.add_widget(liveview)
+        layout.add_widget(liveview.graph)
         return layout
 
 if __name__ == '__main__':
