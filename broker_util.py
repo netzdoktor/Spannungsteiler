@@ -47,3 +47,16 @@ def send_fill_level(sender, timestamp, value):
     }
 
     send("publish", payload)
+
+
+def send_offer(sender, timestamp, value):
+    payload={
+        "type": "offer_publish",
+        "sender": sender,
+        "payload": {
+            "timestamp": timestamp,
+            "offer": value,
+        }
+    }
+    
+    send("publish", payload)
