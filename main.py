@@ -6,6 +6,8 @@ from kivy.uix.button import Button
 from liveview import LiveView
 from flask import Flask, escape, request
 from threading import Thread
+import broker_util
+import requests
 
 class SpannungsteilerApp(App):
     def build(self):
@@ -16,7 +18,6 @@ class SpannungsteilerApp(App):
 
         self.liveview = LiveView()
         self.liveview.register()
-
 
         layout.add_widget(self.liveview.graph)
 
@@ -36,6 +37,12 @@ if __name__ == '__main__':
         ui_app.update(request.json)
         return ""
 
-    t = Thread(target=app.run);
+    t = Thread(target=app.run, kwargs={"host": "0.0.0.0"});
     t.start()
+
+    broker_util.send("subscribe", {
+        "sender": "spannungsteiler",
+        "address": "http://194.94.239.78:5000/spannungsteiler",
+        "interestedIn": "lightcontrol"
+    })
     ui_app.run()

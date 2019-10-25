@@ -19,9 +19,10 @@ class LiveView(Widget):
         return callback
 
     def update(self, json):
-        date = json["date"]
-        value = json["value"]
-        self.plot.points[date] = (date, value)
+        print(json)
+        #date = json["date"]
+        #value = json["value"]
+        #self.plot.points[date] = (date, value)
 
 
     def register(self):
