@@ -25,7 +25,7 @@ def send(send_type, payload):
 def send_demand(sender, timestamp, value):
 
     payload={
-        "type": "demand_publish",
+        "type": "spannungsteiler_demand_publish",
         "sender": sender,
         "payload": {
             "timestamp": timestamp,
@@ -37,7 +37,7 @@ def send_demand(sender, timestamp, value):
 
 def send_fill_level(sender, timestamp, value):
     payload={
-        "type": "fill_level_publish",
+        "type": "spannungsteiler_fill_level_publish",
         "sender": sender,
         "payload": {
             "timestamp": timestamp,
@@ -51,12 +51,12 @@ def send_fill_level(sender, timestamp, value):
 
 def send_offer(sender, timestamp, value):
     payload={
-        "type": "offer_publish",
+        "type": "spannungsteiler_offer_publish",
         "sender": sender,
         "payload": {
             "timestamp": timestamp,
             "offer": value,
         }
     }
-    
+
     send("publish", payload)
