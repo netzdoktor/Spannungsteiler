@@ -2,7 +2,10 @@ import json
 import requests
 
 
-def send(url, json_payload):
+def send(url, payload):
+
+
+    json_payload = json.dumps(payload)
 
     headers = {
     'Content-Type': "application/json",
@@ -23,9 +26,9 @@ def main():
         }
 }
 
-    json_payload = json.dumps(payload)
+    
 
-    send("http://194.94.239.125:9000/request", json_payload)
+    send("http://194.94.239.125:9000/request", payload)
    
 
 if __name__ == "__main__":
