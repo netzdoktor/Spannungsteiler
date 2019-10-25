@@ -42,6 +42,7 @@ if __name__ == '__main__':
         return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
 
     t = Thread(target=app.run, kwargs={"host": "0.0.0.0"});
+    t.daemon = True
     t.start()
 
     broker_util.send("subscribe", {
