@@ -18,6 +18,12 @@ class LiveView(Widget):
 
         return callback
 
+    def update(self, json):
+        date = json["date"]
+        value = json["value"]
+        self.plot.points[date] = (date, value)
+
+
     def register(self):
         # call my_callback every 0.5 seconds
         Clock.schedule_interval(self.create_callback(), 0.05)
