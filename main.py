@@ -12,20 +12,27 @@ import requests
 
 class SpannungsteilerApp(App):
     def build(self):
-        full = GridLayout(rows=2, row_default_height=100, row_force_default=True)
-        full.add_widget(Label(text='Overview', size_hint_y=None))
+        full = GridLayout(rows=3, row_default_height=30, row_force_default=False)
+        full.add_widget(Label(text='Overview', size_hint_y=None, height=20))
 
-        layout = GridLayout(cols=1, row_force_default=True, row_default_height=150)
+        layout = GridLayout(cols=1, row_force_default=True, row_default_height=150, size_hint_y=1)
 
-        self.liveview1 = LiveView(xlabel='X', ylabel='Supply [W]')
-        self.liveview2 = LiveView(xlabel='X', ylabel='Demand [W]')
-        self.liveview3 = LiveView(xlabel='X', ylabel='Fill [%]')
+        self.liveview1 = LiveView(xlabel='Time', ylabel='Supply [W]')
+        self.liveview2 = LiveView(xlabel='Time', ylabel='Demand [W]')
+        self.liveview3 = LiveView(xlabel='Time', ylabel='Fill [%]')
 
         layout.add_widget(self.liveview1.graph)
         layout.add_widget(self.liveview2.graph)
         layout.add_widget(self.liveview3.graph)
 
+
         full.add_widget(layout)
+
+        actions = GridLayout(cols=3, size_hint_y=None, height=50)
+        actions.add_widget(Button(text="Sell"))
+        actions.add_widget(Button(text="Buy"))
+        actions.add_widget(Button(text="Donate"))
+        full.add_widget(actions)
 
         return full
 

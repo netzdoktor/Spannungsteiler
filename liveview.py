@@ -3,26 +3,36 @@ from kivy_garden.graph import Graph, MeshLinePlot
 from kivy.uix.widget import Widget
 from math import sin
 
+SAMPLES = 4 * 24
+
 class LiveView(Widget):
     def __init__(self, **kwargs):
         super().__init__()
-        self.graph = Graph(x_ticks_minor=5,
-            x_ticks_major=25, y_ticks_major=1,
-            y_grid_label=True, x_grid_label=True, padding=5,
-            x_grid=True, y_grid=True, xmin=-0, xmax=100, ymin=-1, ymax=1, **kwargs)
+        self.graph = Graph(x_ticks_minor=4,
+                           x_ticks_major=16,
+                           y_ticks_major=1,
+                           y_grid_label=True,
+                           x_grid_label=True,
+                           padding=5,
+                           x_grid=True,
+                           y_grid=True,
+                           xmin=-0,
+                           xmax=SAMPLES,
+                           ymin=0,
+                           ymax=1, **kwargs)
         self.register()
 
     def create_callback(self):
         self.i = 0
-        self.plot = MeshLinePlot(color=[1, 0, 0, 1])
-        self.plot.points = [(x,0) for x in range(0,101)]
+        self.plot = MeshLinePlot(color=[1, 1, 0, 1])
+        self.plot.points = [(x,0) for x in range(0,SAMPLES+1)]
         self.graph.add_plot(self.plot)
 
         def callback(dt):
-            self.plot.points[self.i] = (self.i, sin((self.i) / 10.))
+            self.plot.points[self.i] = (self.i, (sin((self.i) / 10.) + 1)/2)
             self.i += 1
-            if self.i > 100:
-                self.i = 0
+            if self.i >= SAMPLES:
+                self.i -= SAMPLES
 
         return callback
 
