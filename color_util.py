@@ -1,35 +1,32 @@
 import broker_util
-
-class User():
-    def __init__(self, name):
-        self.name = name
-        self.color = "black"
+import math
+import itertools
+from user import User
 
 class UserLightStatus():
     def __init__(self):
-        self.users = [User("1"), User("2"), User("3")]
+        self.users = [
+            User("30aa4c7f-faa4-4941-968f-3b024a5f1efe", "spannungsteiler"),
+            User("9c55ac05-e4b5-47e5-8596-9ac7346e84ff", "stromteiler")
+        ]
+        self.lights_count = 60
+        lights_per_user = math.ceil(self.lights_count / len(self.users))
+        for i, user in enumerate(self.users):
+            user.lights = [{
+                "id":  + x,
+                "color": user.color
+            } for x in range(i * lights_per_user, (i+1) * lights_per_user)]
+
 
     def update_user(self, id, color):
+        self.users[id].update_color(color)
+
+        lights = list(itertools.chain([x.lights for x in self.users]))
         res = broker_util.send("publish", {
             "type": "lightcontrol",
-            "sender": "foo",
+            "sender": "spannungsteiler",
             "payload": {
-                "lights": [
-                    {
-                        "id": x,
-                        "color": self.users[0].color
-                    } for x in range(21)
-                ] + [
-                    {
-                        "id": x,
-                        "color":self.users[1].color
-                    } for x in range(20,41)
-                ] + [
-                    {
-                        "id": x,
-                        "color": self.users[2].color
-                    } for x in range(40,61)
-                ]
+                "lights": lights
             }
         })
         print(res)
