@@ -17,9 +17,9 @@ class SpannungsteilerApp(App):
 
         layout = GridLayout(cols=1, row_force_default=True, row_default_height=150, size_hint_y=1)
 
-        self.liveview1 = LiveView(xlabel='Time', ylabel='Supply [W]')
-        self.liveview2 = LiveView(xlabel='Time', ylabel='Demand [W]')
-        self.liveview3 = LiveView(xlabel='Time', ylabel='Fill [%]')
+        self.liveview1 = LiveView(xlabel='Time', ylabel='Supply [W]', ymax=3)
+        self.liveview2 = LiveView(xlabel='Time', ylabel='Demand [W]', ymax=2)
+        self.liveview3 = LiveView(xlabel='Time', ylabel='Fill [%]', ymax=1)
 
         layout.add_widget(self.liveview1.graph)
         layout.add_widget(self.liveview2.graph)

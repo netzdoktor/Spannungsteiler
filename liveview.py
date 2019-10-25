@@ -18,8 +18,7 @@ class LiveView(Widget):
                            y_grid=True,
                            xmin=-0,
                            xmax=SAMPLES,
-                           ymin=0,
-                           ymax=1, **kwargs)
+                           ymin=0, **kwargs)
         self.register()
 
     def create_callback(self):
