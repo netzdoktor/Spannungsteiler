@@ -1,24 +1,4 @@
-import json
-import requests
-
-types = {'publish', 'subscribe', 'unsubscribe', 'subscribed', 'request'}
-
-def send(send_type, json_payload):
-
-    url = 'http://194.94.239.125:9000/'
-    if send_type in types:
-        url += send_type
-    else:
-        raise Exception('Give a valid send type.')
-
-    headers = {
-    'Content-Type': "application/json",
-    'cache-control': "no-cache",
-    }
-
-    response = requests.request("POST", url, data=json_payload, headers=headers)
-    print(response)
-
+import broker_util
 
 def main():
 
@@ -28,12 +8,9 @@ def main():
     "payload": {
         "keyword": "Gasverbrauch",
         }
-}
+    }
+    print(broker_util.send("request", payload))
 
-    
-
-    send("http://194.94.239.125:9000/request", payload)
-   
 
 if __name__ == "__main__":
     main()
