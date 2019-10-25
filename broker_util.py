@@ -25,13 +25,25 @@ def send(send_type, payload):
 def send_demand(sender, timestamp, value):
 
     payload={
-        "type": "demand_publisher",
+        "type": "demand_publish",
         "sender": sender,
         "payload": {
             "timestamp": timestamp,
-            "value": value
+            "demand": value
         } 
     }
 
     send("publish", payload)
-  
+
+def send_fill_level(sender, timestamp, value):
+    payload={
+        "type": "fill_level_publish",
+        "sender": sender,
+        "payload": {
+            "timestamp": timestamp,
+            "fill_level": value
+        }
+
+    }
+
+    send("publish", payload)
