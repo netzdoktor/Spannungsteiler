@@ -1,0 +1,20 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[[source]]
+name = "kivy_garden"
+url = "https://kivy-garden.github.io/simple/"
+
+[dev-packages]
+
+[packages]
+kivy = "*"
+kivy-garden.graph = { version = "0.4.dev0", index = "kivy_garden"}
+
+[requires]
+python_version = "3.6"
+
+[pipenv]
+allow_prereleases = true
