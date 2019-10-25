@@ -1,11 +1,15 @@
 import json
 import requests
 
+types = {'publish', 'subscribe', 'unsubscribe', 'subscribed', 'request'}
 
-def send(url, payload):
+def send(send_type, json_payload):
 
-
-    json_payload = json.dumps(payload)
+    url = 'http://194.94.239.125:9000/'
+    if send_type in types:
+        url += send_type
+    else:
+        raise Exception('Give a valid send type.')
 
     headers = {
     'Content-Type': "application/json",
