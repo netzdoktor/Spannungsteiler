@@ -1,10 +1,10 @@
 import broker_util
 import pandas as pd
-import os
+import time
 
-TYPE = 'battery'
+TYPE = 'user'
 USER = 1
-USERID = 'bla'
+USERID = '30aa4c7f-faa4-4941-968f-3b024a5f1efe'
 
 file = './Messdaten.xlsx'
 
@@ -22,10 +22,9 @@ elif TYPE is 'user':
 
 dataframe = pd.read_excel(file)
 dataframe = dataframe[0:96]
-dataframe = dataframe[0:5]
 
 for index, row in dataframe.iterrows():
-    timestamp = row['Unnamed: 0']
+    timestamp = str(row['Unnamed: 0'])
     value = row[column]
     if TYPE is 'source':
         broker_util.send_offer(USERID, timestamp, value)
@@ -33,3 +32,4 @@ for index, row in dataframe.iterrows():
         broker_util.send_fill_level(USERID, timestamp, value)
     elif TYPE is 'user':
         broker_util.send_demand(USERID, timestamp, value)
+    time.sleep(0.03)
