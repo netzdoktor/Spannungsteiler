@@ -62,18 +62,6 @@ def send_offer(sender, timestamp, value):
     send("publish", payload)
 
 
-def transaction_submit_blocking(sender, amount):
-    payload={
-        "type": "spannungsteiler_transaction_execution",
-        "sender": sender,
-        "payload": {
-            "amount": amount
-        }
-    }
-
-    send("request", payload)
-
-
 def send_transaction_execution(sender, amount, previous_id):
     payload={
         "type": "spannungsteiler_transaction_execution",
