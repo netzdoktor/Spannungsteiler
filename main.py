@@ -17,7 +17,7 @@ def get_local_ip():
     s.close()
     return ip
 
-def subscribe_to_topics():
+def subscribe_to_topics(port=5000):
     topics = [ "spannungsteiler_demand_publish",
                "spannungsteiler_fill_level_publish",
                "spannungsteiler_offer_publish" ]
@@ -26,11 +26,11 @@ def subscribe_to_topics():
     for topic in topics:
         broker_util.send("subscribe", {
             "sender": "spannungsteiler",
-            "address": "http://{}:5000/spannungsteiler".format(get_local_ip()),
+            "address": "http://{}:{}/spannungsteiler".format(get_local_ip(), port),
             "interestedIn": topic
         })
 
-def start_server(ui_app):
+def start_server(ui_app, port):
     app = Flask(__name__)
     @app.route('/spannungsteiler', methods=["POST"])
     def endpoint():
@@ -38,15 +38,16 @@ def start_server(ui_app):
             ui_app.update(request.json)
         return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
 
-    t = Thread(target=app.run, kwargs={"host": "0.0.0.0"});
+    t = Thread(target=app.run, kwargs={"host": "0.0.0.0", "port": port});
     t.daemon = True
     t.start()
 
 if __name__ == '__main__':
     user = USERS[int(sys.argv[1])]
+    port = int(sys.argv[2]) if len(sys.argv) > 2 else 5000
     ui_app = SpannungsteilerApp(user)
-    start_server(ui_app)
+    start_server(ui_app, port)
 
-    subscribe_to_topics()
+    subscribe_to_topics(port)
 
     ui_app.run()
