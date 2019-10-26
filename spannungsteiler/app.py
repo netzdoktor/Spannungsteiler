@@ -1,5 +1,3 @@
-from household import Household
-from liveview import LiveView
 from math import ceil
 from kivy.app import App
 from kivy.clock import Clock
@@ -7,7 +5,10 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
 from kivy.uix.button import Button
-from color_util import UserLightStatus
+from .household import Household
+from .ui.liveview import LiveView
+from .util.color_util import UserLightStatus
+
 
 def str_to_quarter_no(s):
     FMT = '%H:%M:%S'

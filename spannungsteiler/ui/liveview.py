@@ -1,7 +1,7 @@
+from math import sin, ceil
 from kivy.clock import Clock
 from kivy_garden.graph import Graph, MeshLinePlot
 from kivy.uix.widget import Widget
-from math import sin, ceil
 
 SAMPLES = 4 * 24
 

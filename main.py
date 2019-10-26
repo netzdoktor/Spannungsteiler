@@ -1,11 +1,11 @@
 from flask import Flask, escape, request
 import json
 from threading import Thread
-import broker_util
 import requests
 from datetime import datetime
-from user import User, USERS
-from app import SpannungsteilerApp
+from spannungsteiler.util import broker_util
+from spannungsteiler.app import SpannungsteilerApp
+from spannungsteiler.user import User, USERS
 
 
 def subscribe_to_topics():
