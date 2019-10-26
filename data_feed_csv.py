@@ -2,11 +2,22 @@ from broker_util import send_demand
 import pandas as pd
 from datetime import time
 from time import sleep
+import sys
 
+if len(sys.argv) != 3:
+    raise Exception('Give USERID and PROFILE parameters')
 
-USERID = '30aa4c7f-faa4-4941-968f-3b024a5f1efe'
+USERID = sys.argv[1]
+PROFILE = int(sys.argv[2])
 
-dataframe = pd.read_csv("data/Rentner.csv", sep=",")
+if PROFILE == 1:
+    dataframe = pd.read_csv("data/MisterX.csv", sep=",")
+elif PROFILE == 2:
+    dataframe = pd.read_csv("data/Rentner.csv", sep=",")
+elif PROFILE == 3:
+    dataframe = pd.read_csv("data/Student.csv", sep=",")
+else:
+    raise Exception("Give valid PROFILE")
 
 for index, row in dataframe.iterrows():
 
