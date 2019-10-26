@@ -62,9 +62,21 @@ def send_offer(sender, timestamp, value):
     send("publish", payload)
 
 
-def send_transaction(sender, amount, previous_id):
+def send_transaction_submit(sender, amount):
     payload={
-        "type": "spannungsteiler_offer_publish",
+        "type": "spannungsteiler_transaction_execution",
+        "sender": sender,
+        "payload": {
+            "amount": amount
+        }
+    }
+
+    send("publish", payload)
+
+
+def send_transaction_execution(sender, amount, previous_id):
+    payload={
+        "type": "spannungsteiler_transaction_execution",
         "sender": sender,
         "payload": {
             "amount": amount
