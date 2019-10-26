@@ -1,15 +1,17 @@
 import pandas as pd
+import broker_util
 
 class Household():
-    def __init__(self):
-        file = './Messdaten.xlsx'
+    def __init__(self, user):
+        file = './data/Messdaten.xlsx'
 
         self._current_time = 0
         self._max_samples = 96
 
+        self.user = user
         self.buffer = 1.0
-        self.buffer_target = 0.2
-        self.buffer_capacity = 10000
+        self.buffer_target = 0.0
+        self.buffer_capacity = 500
         self.production = 0
         self.consumption = 0
         dataframe = pd.read_excel(file)
@@ -20,15 +22,19 @@ class Household():
         def callback(dt):
             # TODO: parse ID
             row = self._profile.iloc[self._current_time]
+            self.buffer_target = row["Batterie Sollwert [%]"]
             self.produce(row["Energieproduktion [W]"])
-            self.consume(row['Energieverbrauch1 [W]'])
+            self.consume(row['Energieverbrauch{} [W]'.format(self.user.index)])
             self._current_time = (self._current_time + 1) % self._max_samples
+            #broker_util.send_offer(self.user.id, self._current_time, self.offer)
+            #broker_util.send_demand(self.user.id, self._current_time, self.demand)
         return callback
 
     def consume(self, value):
         self.consumption = value
         self.buffer -= value / self.buffer_capacity
-        assert(self.buffer >= 0)
+        if self.buffer < 0.0:
+            self.buffer = 0.0
 
     def produce(self, value):
         self.production = value

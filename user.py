@@ -1,7 +1,8 @@
 class User():
-    def __init__(self, id, name):
+    def __init__(self, id, name, index):
         self.id = id
         self.name = name
+        self.index = index
         self.color = "black"
         self.lights = []
 

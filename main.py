@@ -14,6 +14,7 @@ from color_util import UserLightStatus
 from math import ceil
 from datetime import datetime
 from household import Household
+from user import User
 
 def str_to_quarter_no(s):
     FMT = '%H:%M:%S'
@@ -22,6 +23,11 @@ def str_to_quarter_no(s):
 
 
 class SpannungsteilerApp(App):
+    def __init__(self, user):
+        self.user = user
+        self.household = Household(user)
+        super().__init__()
+
     def build_graphs(self):
         layout = GridLayout(cols=1, row_force_default=True, row_default_height=150, size_hint_y=1)
         self.liveview_offer = LiveView(xlabel='Time', ylabel='Offer [W]', ymax=3000,y_ticks_major=1000,)
@@ -47,7 +53,6 @@ class SpannungsteilerApp(App):
         return actions
 
     def build(self):
-        self.household = Household()
 
         cb = self.household.round_callback()
         def callback(dt):
@@ -56,7 +61,7 @@ class SpannungsteilerApp(App):
             self.liveview_offer.update(self.household._current_time, self.household.offer)
             self.liveview_battery.update(self.household._current_time, self.household.buffer*100)
 
-        Clock.schedule_interval(callback, 0.1)
+        Clock.schedule_interval(callback, 0.06)
 
         self.user_status_lights = UserLightStatus()
 
@@ -72,6 +77,8 @@ class SpannungsteilerApp(App):
         return callback
 
     def update(self, json):
+        if(json["event"]["sender"] == self.user.id):
+            return
         if self.household.balance < 0.0:
             color = "red"
         else:
@@ -89,9 +96,21 @@ class SpannungsteilerApp(App):
         else:
             pass
 
+def subscribe_to_topics():
+    topics = [ "spannungsteiler_demand_publish",
+               "spannungsteiler_fill_level_publish",
+               "spannungsteiler_offer_publish" ]
+    for topic in topics:
+        broker_util.send("subscribe", {
+            "sender": "spannungsteiler",
+            "address": "http://194.94.239.78:5000/spannungsteiler",
+            "interestedIn": topic
+        })
+
 if __name__ == '__main__':
     app = Flask(__name__)
-    ui_app = SpannungsteilerApp()
+    user = User("30aa4c7f-faa4-4941-968f-3b024a5f1efe", "spannungsteiler", 1)
+    ui_app = SpannungsteilerApp(user)
 
     @app.route('/spannungsteiler', methods=["POST"])
     def endpoint():
@@ -103,12 +122,6 @@ if __name__ == '__main__':
     t.daemon = True
     t.start()
 
-    for topic in [ "spannungsteiler_demand_publish",
-        "spannungsteiler_fill_level_publish",
-        "spannungsteiler_offer_publish"]:
-        broker_util.send("subscribe", {
-            "sender": "spannungsteiler",
-            "address": "http://194.94.239.78:5000/spannungsteiler",
-            "interestedIn": topic
-        })
+    subscribe_to_topics()
+
     ui_app.run()
