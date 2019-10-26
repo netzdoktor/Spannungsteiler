@@ -20,14 +20,13 @@ class Household():
 
     def round_callback(self):
         def callback(dt):
-            # TODO: parse ID
             row = self._profile.iloc[self._current_time]
             self.buffer_target = row["Batterie Sollwert [%]"]
             self.produce(row["Energieproduktion [W]"])
             self.consume(row['Energieverbrauch{} [W]'.format(self.user.index)])
             self._current_time = (self._current_time + 1) % self._max_samples
-            #broker_util.send_offer(self.user.id, self._current_time, self.offer)
-            #broker_util.send_demand(self.user.id, self._current_time, self.demand)
+            broker_util.send_offer(self.user.id, self._current_time, self.offer)
+            broker_util.send_demand(self.user.id, self._current_time, self.demand)
         return callback
 
     def consume(self, value):
