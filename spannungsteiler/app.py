@@ -5,6 +5,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
 from kivy.uix.button import Button
+from datetime import datetime
 from .household import Household
 from .ui.liveview import LiveView
 from .util.color_util import UserLightStatus
@@ -81,7 +82,7 @@ class SpannungsteilerApp(App):
 
         self.user_status_lights.update_user(0, color)
         payload = json["event"]["payload"]
-        date = str_to_quarter_no(payload["timestamp"])
+        date = payload["timestamp"]
         if json["event"]["type"] == "spannungsteiler_demand_publish":
             self.liveview_demand.update(sender, date, payload["demand"])
         elif json["event"]["type"] == "spannungsteiler_fill_level_publish":
