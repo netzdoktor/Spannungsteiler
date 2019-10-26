@@ -50,9 +50,9 @@ class SpannungsteilerApp(App):
         cb = self.household.round_callback()
         def callback(dt):
             cb(dt)
-            self.liveview_demand.update(self.household._current_time, self.household.demand)
-            self.liveview_offer.update(self.household._current_time, self.household.offer)
-            self.liveview_battery.update(self.household._current_time, self.household.buffer*100)
+            self.liveview_demand.update(self.user.id, self.household._current_time, self.household.demand)
+            self.liveview_offer.update(self.user.id, self.household._current_time, self.household.offer)
+            self.liveview_battery.update(self.user.id, self.household._current_time, self.household.buffer*100)
 
         Clock.schedule_interval(callback, 0.06)
 
@@ -70,21 +70,23 @@ class SpannungsteilerApp(App):
         return callback
 
     def update(self, json):
-        if(json["event"]["sender"] == self.user.id):
+        sender = json["event"]["sender"]
+        if(sender == self.user.id):
             return
         if self.household.balance < 0.0:
             color = "red"
         else:
             color = "green"
 
+
         self.user_status_lights.update_user(0, color)
         payload = json["event"]["payload"]
         date = str_to_quarter_no(payload["timestamp"])
         if json["event"]["type"] == "spannungsteiler_demand_publish":
-            self.liveview_demand.update(date, payload["demand"])
+            self.liveview_demand.update(sender, date, payload["demand"])
         elif json["event"]["type"] == "spannungsteiler_fill_level_publish":
-            self.liveview_battery.update(date, payload["fill_level"])
+            self.liveview_battery.update(sender, date, payload["fill_level"])
         elif json["event"]["type"] == "spannungsteiler_offer_publish":
-            self.liveview_offer.update(date, payload["offer"])
+            self.liveview_offer.update(sender, date, payload["offer"])
         else:
             pass

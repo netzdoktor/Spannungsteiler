@@ -3,6 +3,7 @@ import json
 from threading import Thread
 import requests
 from datetime import datetime
+import sys
 from spannungsteiler.util import broker_util
 from spannungsteiler.app import SpannungsteilerApp
 from spannungsteiler.user import User, USERS
@@ -32,7 +33,7 @@ def start_server(ui_app):
     t.start()
 
 if __name__ == '__main__':
-    user = USERS[0]
+    user = USERS[int(sys.argv[1])]
     ui_app = SpannungsteilerApp(user)
     start_server(ui_app)
 

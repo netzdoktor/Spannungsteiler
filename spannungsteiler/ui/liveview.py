@@ -1,3 +1,4 @@
+import collections
 from math import sin, ceil
 from kivy.clock import Clock
 from kivy_garden.graph import Graph, MeshLinePlot
@@ -21,24 +22,14 @@ class LiveView(Widget):
         self.plot = MeshLinePlot(color=[1, 1, 0, 1])
         self.plot.points = [(x,0) for x in range(0,SAMPLES+1)]
         self.graph.add_plot(self.plot)
+        self.total_plot = MeshLinePlot(color=[0, 1, 1, 1])
+        self.total_plot.points = [(x,0) for x in range(0,SAMPLES+1)]
 
-        #self.register()
+        self.values = collections.defaultdict(lambda: [0 for x in range(0,SAMPLES+1)])
 
-    def create_callback(self):
-        self.i = 0
+    def update(self, sender, date, value):
+        self.values[sender][date] = value
+        total = [self.values[sender][date] for sender in self.values.keys()]
 
-        def callback(dt):
-            self.plot.points[self.i] = (self.i, (sin((self.i) / 10.) + 1)/2)
-            self.i += 1
-            if self.i >= SAMPLES:
-                self.i -= SAMPLES
-
-        return callback
-
-    def update(self, date, value):
         self.plot.points[date] = (date, value)
-
-
-    def register(self):
-        # call my_callback every 0.5 seconds
-        Clock.schedule_interval(self.create_callback(), 0.05)
+        self.total_plot.points[date] = (date, sum(total))
