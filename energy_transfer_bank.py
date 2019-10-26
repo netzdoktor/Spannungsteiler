@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from flask import Flask, escape, request
 import threading, json, time
 from spannungsteiler.util import broker_util

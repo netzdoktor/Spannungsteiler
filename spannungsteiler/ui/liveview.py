@@ -24,6 +24,7 @@ class LiveView(Widget):
         self.graph.add_plot(self.plot)
         self.total_plot = MeshLinePlot(color=[0, 1, 1, 1])
         self.total_plot.points = [(x,0) for x in range(0,SAMPLES+1)]
+        self.graph.add_plot(self.total_plot)
 
         self.values = collections.defaultdict(lambda: [0 for x in range(0,SAMPLES+1)])
 
