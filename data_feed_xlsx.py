@@ -1,19 +1,23 @@
 import broker_util
 import pandas as pd
 import time
+import sys
 
-TYPE = 'user'
-USER = 1
-USERID = '30aa4c7f-faa4-4941-968f-3b024a5f1efe'
+if len(sys.argv) != 3:
+    raise Exception('Give USERID and PROFILE parameters')
+USERID = sys.argv[1]
+PROFILE = int(sys.argv[2])
 
 file = './Messdaten.xlsx'
 
-if USER is 1:
+if PROFILE is 1:
     column = 'Energieverbrauch1 [W]'
-elif USER is 2:
+elif PROFILE is 2:
     column = 'Energieverbrauch2 [W]'
-elif USER is 3:
+elif PROFILE is 3:
     column = 'Energieverbrauch3 [W]'
+else:
+    raise Exception(str(PROFILE) + ' is not a valid profile.')
 
 dataframe = pd.read_excel(file)
 dataframe = dataframe[0:96]
