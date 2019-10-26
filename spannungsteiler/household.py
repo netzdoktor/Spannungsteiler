@@ -1,5 +1,6 @@
 import pandas as pd
 from .util import broker_util
+import numpy as np
 
 class Household():
     def __init__(self, user):
@@ -22,11 +23,13 @@ class Household():
         def callback(dt):
             row = self._profile.iloc[self._current_time]
             self.buffer_target = row["Batterie Sollwert [%]"]
-            self.produce(row["Energieproduktion [W]"])
-            self.consume(row['Energieverbrauch{} [W]'.format(self.user.index)])
+            self.produce(row["Energieproduktion [W]"] + np.random.normal(1000, 500))
+            self.consume(row['Energieverbrauch{} [W]'.format(self.user.index)] + np.random.normal(1000, 500))
             self._current_time = (self._current_time + 1) % self._max_samples
-            broker_util.send_offer(self.user.id, self._current_time, self.offer)
-            broker_util.send_demand(self.user.id, self._current_time, self.demand)
+            if self.offer > 0:
+                broker_util.send_offer(self.user.id, self._current_time, self.offer)
+            if self.demand > 0:
+                broker_util.send_demand(self.user.id, self._current_time, self.demand)
         return callback
 
     def consume(self, value):
