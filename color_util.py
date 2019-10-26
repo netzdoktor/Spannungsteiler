@@ -1,14 +1,11 @@
 import broker_util
 import math
 import itertools
-from user import User
+from user import USERS
 
 class UserLightStatus():
     def __init__(self):
-        self.users = [
-            User("30aa4c7f-faa4-4941-968f-3b024a5f1efe", "spannungsteiler", 1),
-            User("9c55ac05-e4b5-47e5-8596-9ac7346e84ff", "stromteiler", 2)
-        ]
+        self.users = USERS
         self.lights_count = 60
         lights_per_user = math.ceil(self.lights_count / len(self.users))
         for i, user in enumerate(self.users):

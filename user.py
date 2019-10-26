@@ -10,3 +10,8 @@ class User():
         self.color = color
         for light in self.lights:
             light["color"] = color
+
+USERS = [
+    User("30aa4c7f-faa4-4941-968f-3b024a5f1efe", "spannungsteiler", 1),
+    User("9c55ac05-e4b5-47e5-8596-9ac7346e84ff", "stromteiler", 2)
+]

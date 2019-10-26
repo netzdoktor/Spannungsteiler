@@ -4,7 +4,7 @@ from threading import Thread
 import broker_util
 import requests
 from datetime import datetime
-from user import User
+from user import User, USERS
 from app import SpannungsteilerApp
 
 
@@ -32,7 +32,7 @@ def start_server(ui_app):
     t.start()
 
 if __name__ == '__main__':
-    user = User("30aa4c7f-faa4-4941-968f-3b024a5f1efe", "spannungsteiler", 1)
+    user = USERS[0]
     ui_app = SpannungsteilerApp(user)
     start_server(ui_app)
 
