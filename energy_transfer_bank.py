@@ -26,7 +26,8 @@ if __name__ == "__main__":
         if amount < 0:
             energy_requested[sender_id] = amount
         elif amount > 0:
-            energy_provided[sender_id] = amount
+            # if a user wants to provide energy, he will subtract from his energy pool, hence expects a negative return value
+            energy_provided[sender_id] = -amount        
 
         return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
 
@@ -43,40 +44,43 @@ if __name__ == "__main__":
         provided_sum = 0
         requested_sum = 0
 
+        #calculate total energy provided
         for key in energy_provided.keys():
             provided_sum += energy_provided.get(key)
 
+        #calculate total energy requested
         for key in energy_requested.keys():
             requested_sum += energy_requested.get(key)
 
+        
         for key in energy_provided.keys():
-            amount = energy_provided.get(key)
-            answere = 0
+            amount = energy_provided.get(key)       #negative amount
+            answer = 0
 
-            if amount <= abs(requested_sum):
-                answere -= amount
+            if abs(amount) >= abs(requested_sum):   #both values are negative
+                answer = amount
 
             else:
-                answere = requested_sum
+                answer = requested_sum              # if amount is smaller than the remaining sum, send the remainder instead
 
-            broker_util.send_transaction_execution("energy_bank", answere, key)
-            requested_sum -= answere
+            broker_util.send_transaction_execution("energy_bank", answer, key) #sends a negative answer
+            requested_sum -= answer
 
 
             
 
         for key in energy_requested.keys():
-            amount = energy_requested.get(key)
-            answere = 0
+            amount = energy_requested.get(key)      #positive amount
+            answer = 0
 
-            if abs(amount) <= provided_sum:
-                answere -= amount
+            if amount >= provided_sum:
+                answer = amount
 
             else:
-                answere = provided_sum
+                answer = provided_sum               # if amount is smaller than the remaining sum, send the remainder instead
 
-            broker_util.send_transaction_execution("enerrgy_bank", answere, key)
-            provided_sum -= answere
+            broker_util.send_transaction_execution("enerrgy_bank", answer, key)
+            provided_sum -= answer
 
 
         
