@@ -12,28 +12,18 @@ import requests
 from color_util import UserLightStatus
 
 class SpannungsteilerApp(App):
-    def build(self):
-        self.demand = 0
-        self.supply = 0
-        self.fill = 0
-        self.user_status_lights = UserLightStatus()
-
-        full = GridLayout(rows=3, row_default_height=30, row_force_default=False)
-        full.add_widget(Label(text='Overview', size_hint_y=None, height=20))
-
+    def build_graphs(self):
         layout = GridLayout(cols=1, row_force_default=True, row_default_height=150, size_hint_y=1)
-
-        self.liveview1 = LiveView(xlabel='Time', ylabel='Supply [W]', ymax=3)
-        self.liveview2 = LiveView(xlabel='Time', ylabel='Demand [W]', ymax=2)
-        self.liveview3 = LiveView(xlabel='Time', ylabel='Fill [%]', ymax=1)
+        self.liveview1 = LiveView(xlabel='Time', ylabel='Supply [W]', ymax=3,y_ticks_major=1,)
+        self.liveview_demand = LiveView(xlabel='Time', ylabel='Demand [W]', ymax=1050,y_ticks_major=500,)
+        self.liveview3 = LiveView(xlabel='Time', ylabel='Fill [%]', ymax=1,y_ticks_major=1,)
 
         layout.add_widget(self.liveview1.graph)
-        layout.add_widget(self.liveview2.graph)
+        layout.add_widget(self.liveview_demand.graph)
         layout.add_widget(self.liveview3.graph)
+        return layout
 
-
-        full.add_widget(layout)
-
+    def build_actions(self):
         actions = GridLayout(cols=3, size_hint_y=None, height=50)
         sell_button = Button(text="Sell")
         sell_button.bind(on_press=self.click())
@@ -44,9 +34,19 @@ class SpannungsteilerApp(App):
         donate_button = Button(text="Donate")
         donate_button.bind(on_press=self.click())
         actions.add_widget(donate_button)
-        full.add_widget(actions)
+        return actions
 
-        return full
+    def build(self):
+        self.demand = 0
+        self.supply = 0
+        self.fill = 0
+        self.user_status_lights = UserLightStatus()
+
+        layout = GridLayout(rows=3, row_default_height=30, row_force_default=False)
+        layout.add_widget(Label(text='Overview', size_hint_y=None, height=20))
+        layout.add_widget(self.build_graphs())
+        layout.add_widget(self.build_actions())
+        return layout
 
     def click(self):
         def callback(instance):
@@ -60,8 +60,10 @@ class SpannungsteilerApp(App):
             color = "green"
 
         self.user_status_lights.update_user(0, color)
-
-        self.liveview1.update(json)
+        if json["event"]["type"] == "spannungsteiler_demand_publish":
+            self.liveview_demand.update(json)
+        else:
+            pass
 
 if __name__ == '__main__':
     app = Flask(__name__)
@@ -69,7 +71,8 @@ if __name__ == '__main__':
 
     @app.route('/spannungsteiler', methods=["POST"])
     def endpoint():
-        ui_app.update(request.json)
+        if request.json["event"]["sender"] != "spannungsteiler":
+            ui_app.update(request.json)
         return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
 
     t = Thread(target=app.run, kwargs={"host": "0.0.0.0"});
@@ -79,6 +82,6 @@ if __name__ == '__main__':
     broker_util.send("subscribe", {
         "sender": "spannungsteiler",
         "address": "http://194.94.239.78:5000/spannungsteiler",
-        "interestedIn": "lightcontrol"
+        "interestedIn": "spannungsteiler_demand_publish"
     })
     ui_app.run()
