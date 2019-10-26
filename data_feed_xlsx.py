@@ -8,7 +8,7 @@ if len(sys.argv) != 3:
 USERID = sys.argv[1]
 PROFILE = int(sys.argv[2])
 
-file = './Messdaten.xlsx'
+file = './data/Messdaten.xlsx'
 
 if PROFILE is 1:
     column = 'Energieverbrauch1 [W]'
