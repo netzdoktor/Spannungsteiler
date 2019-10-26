@@ -19,12 +19,20 @@ class Household():
         dataframe = dataframe[0:self._max_samples]
         self._profile = dataframe
 
+        self.dataframe_consume = pd.read_csv("data/{}.csv".format(user.consume_profile), sep=",", header=None)
+        self.dataframe_produce = pd.read_csv("data/{}.csv".format(user.produce_profile), sep=",", header=None)
+
+
     def round_callback(self):
         def callback(dt):
-            row = self._profile.iloc[self._current_time]
-            self.buffer_target = row["Batterie Sollwert [%]"]
-            self.produce(row["Energieproduktion [W]"] + np.random.normal(1000, 500))
-            self.consume(row['Energieverbrauch{} [W]'.format(self.user.index)] + np.random.normal(1000, 500))
+            row_profile = self._profile.iloc[self._current_time]
+            row_consume = self.dataframe_consume.iloc[self._current_time]
+            row_produce = self.dataframe_produce.iloc[self._current_time]
+
+            self.buffer_target = row_profile["Batterie Sollwert [%]"]
+            self.produce(row_produce[2] + np.random.normal(1000, 500))
+            self.consume(row_consume[2] + np.random.normal(1000, 500))
+
             self._current_time = (self._current_time + 1) % self._max_samples
             if self.offer > 0:
                 broker_util.send_offer(self.user.id, self._current_time, self.offer)
