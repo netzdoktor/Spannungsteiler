@@ -20,7 +20,8 @@ def get_local_ip():
 def subscribe_to_topics(port=5000):
     topics = [ "spannungsteiler_demand_publish",
                "spannungsteiler_fill_level_publish",
-               "spannungsteiler_offer_publish" ]
+               "spannungsteiler_offer_publish",
+               "spannungsteiler_transaction_execution" ]
 
 
     for topic in topics:

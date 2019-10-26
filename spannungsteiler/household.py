@@ -34,10 +34,8 @@ class Household():
             self.consume(row_consume[2] + np.random.normal(1000, 500))
 
             self._current_time = (self._current_time + 1) % self._max_samples
-            if self.offer > 0:
-                broker_util.send_offer(self.user.id, self._current_time, self.offer)
-            if self.demand > 0:
-                broker_util.send_demand(self.user.id, self._current_time, self.demand)
+            broker_util.send_offer(self.user.id, self._current_time, self.offer)
+            broker_util.send_demand(self.user.id, self._current_time, self.demand)
         return callback
 
     def consume(self, value):
@@ -51,6 +49,13 @@ class Household():
         self.buffer += value / self.buffer_capacity
         if self.buffer > 1.0:
             self.buffer = 1.0
+
+    def transaction(self, value):
+        self.buffer += value / self.buffer_capacity
+        if self.buffer > 1.0:
+            self.buffer = 1.0
+        if self.buffer < 0.0:
+            self.buffer = 0.0
 
     @property
     def balance(self):

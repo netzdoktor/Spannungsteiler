@@ -55,7 +55,7 @@ class SpannungsteilerApp(App):
             self.liveview_offer.update(self.user.id, self.household._current_time, self.household.offer)
             self.liveview_battery.update(self.user.id, self.household._current_time, self.household.buffer*100)
 
-        Clock.schedule_interval(callback, 0.06)
+        Clock.schedule_interval(callback, 0.2)
 
         self.user_status_lights = UserLightStatus()
 
@@ -80,14 +80,19 @@ class SpannungsteilerApp(App):
             color = "green"
 
 
-        self.user_status_lights.update_user(0, color)
+        #self.user__lights.update_user(0, color)
         payload = json["event"]["payload"]
-        date = payload["timestamp"]
         if json["event"]["type"] == "spannungsteiler_demand_publish":
+            date = payload["timestamp"]
             self.liveview_demand.update(sender, date, payload["demand"])
         elif json["event"]["type"] == "spannungsteiler_fill_level_publish":
+            date = payload["timestamp"]
             self.liveview_battery.update(sender, date, payload["fill_level"])
         elif json["event"]["type"] == "spannungsteiler_offer_publish":
+            date = payload["timestamp"]
             self.liveview_offer.update(sender, date, payload["offer"])
+        elif json["event"]["type"] == "spannungsteiler_transaction_execution":
+            self.household.transaction(payload["amount"])
         else:
+
             pass
