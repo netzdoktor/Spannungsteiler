@@ -1,23 +1,32 @@
 from flask import Flask, escape, request
 import threading, json, time
-import broker_util
+from spannungsteiler.util import broker_util
+import socket
 
 app = Flask(__name__)
+energy_requested = {}
+energy_provided = {}
 
 
+def get_local_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("9.9.9.9", 80))
+    ip = s.getsockname()[0]
+    s.close()
+    return ip
 
-if __name__ == "__main__":
+def subscribe_to_topics():
+    broker_util.send("subscribe", {
+        "sender": "energy_bank",
+        "address": "http://{}:5000/energy_bank".format(get_local_ip()),
+        "interestedIn": ""
+    })
 
-    energy_requested = {}
-    energy_provided = {}
-
-
-    
+def start_server():
     app = Flask(__name__)
 
     @app.route('/energy_bank', methods=["POST"])
-    def endpoint()
-
+    def endpoint():
 
         payload = request.json
         amount = payload["payload"]["amount"]
@@ -31,12 +40,16 @@ if __name__ == "__main__":
         return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
 
 
+        t = threading.Thread(target=app.run, kwargs={"host": "0.0.0.0"})
+        t.daemon = False
+        t.start()
 
 
-    t = threading.Thread(target=app.run, kwargs={"host": "0.0.0.0"})
-    t.daemon = False
-    t.start()
+if __name__ == "__main__":
 
+
+    subscribe_to_topics()
+    start_server()
 
     while True:
 
@@ -63,8 +76,6 @@ if __name__ == "__main__":
             requested_sum -= answere
 
 
-            
-
         for key in energy_requested.keys():
             amount = energy_requested.get(key)
             answere = 0
@@ -75,18 +86,9 @@ if __name__ == "__main__":
             else:
                 answere = provided_sum
 
-            broker_util.send_transaction_execution("enerrgy_bank", answere, key)
-            provided_sum -= answere
-
-
-        
+            broker_util.send_transaction_execution("energy_bank", answere, key)
+            provided_sum -= answere      
         
 
-        
+        time.sleep(0.3)
 
-        time.sleep(0.2)
-
-
-
-
-    print("App is running")
