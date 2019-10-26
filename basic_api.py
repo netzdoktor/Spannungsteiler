@@ -1,4 +1,4 @@
-import broker_util
+import spannungsteiler.util.broker_util
 
 def main():
 

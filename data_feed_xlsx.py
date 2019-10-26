@@ -27,4 +27,4 @@ for index, row in dataframe.iterrows():
     broker_util.send_offer(USERID, timestamp, row["Energieproduktion [W]"])
     broker_util.send_fill_level(USERID, timestamp, row["Batterie Sollwert [%]"])
     broker_util.send_demand(USERID, timestamp, row[column])
-    time.sleep(0.3)
+    time.sleep(1)
