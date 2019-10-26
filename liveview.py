@@ -2,14 +2,8 @@ from kivy.clock import Clock
 from kivy_garden.graph import Graph, MeshLinePlot
 from kivy.uix.widget import Widget
 from math import sin, ceil
-from datetime import datetime
 
 SAMPLES = 4 * 24
-
-def str_to_quarter_no(s):
-    FMT = '%H:%M:%S'
-    tdelta = (datetime.strptime(s, FMT) - datetime.strptime("00:00:00", FMT)).total_seconds()
-    return ceil(tdelta / (60*16))
 
 class LiveView(Widget):
     def __init__(self, **kwargs):
@@ -41,11 +35,7 @@ class LiveView(Widget):
 
         return callback
 
-    def update(self, json, type):
-        payload = json["event"]["payload"]
-        print(payload)
-        date = str_to_quarter_no(payload["timestamp"])
-        value = payload[type]
+    def update(self, date, value):
         self.plot.points[date] = (date, value)
 
 

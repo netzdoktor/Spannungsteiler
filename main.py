@@ -10,6 +10,15 @@ from threading import Thread
 import broker_util
 import requests
 from color_util import UserLightStatus
+from math import ceil
+from datetime import datetime
+
+
+def str_to_quarter_no(s):
+    FMT = '%H:%M:%S'
+    tdelta = (datetime.strptime(s, FMT) - datetime.strptime("00:00:00", FMT)).total_seconds()
+    return ceil(tdelta / (60*16))
+
 
 class SpannungsteilerApp(App):
     def build_graphs(self):
@@ -60,12 +69,14 @@ class SpannungsteilerApp(App):
             color = "green"
 
         self.user_status_lights.update_user(0, color)
+        payload = json["event"]["payload"]
+        date = str_to_quarter_no(payload["timestamp"])
         if json["event"]["type"] == "spannungsteiler_demand_publish":
-            self.liveview_demand.update(json, "demand")
+            self.liveview_demand.update(date, payload["demand"])
         elif json["event"]["type"] == "spannungsteiler_fill_level_publish":
-            self.liveview_battery.update(json, "fill_level")
+            self.liveview_battery.update(date, payload["fill_level"])
         elif json["event"]["type"] == "spannungsteiler_offer_publish":
-            self.liveview_offer.update(json, "offer")
+            self.liveview_offer.update(date, payload["offer"])
         else:
             pass
 
@@ -76,7 +87,6 @@ if __name__ == '__main__':
     @app.route('/spannungsteiler', methods=["POST"])
     def endpoint():
         if request.json["event"]["sender"] != "spannungsteiler":
-            print(request.json)
             ui_app.update(request.json)
         return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
 
@@ -84,9 +94,12 @@ if __name__ == '__main__':
     t.daemon = True
     t.start()
 
-    broker_util.send("subscribe", {
-        "sender": "spannungsteiler",
-        "address": "http://194.94.239.78:5000/spannungsteiler",
-        "interestedIn": "spannungsteiler_offer_publish"
-    })
+    for topic in [ "spannungsteiler_demand_publish",
+        "spannungsteiler_fill_level_publish",
+        "spannungsteiler_offer_publish"]:
+        broker_util.send("subscribe", {
+            "sender": "spannungsteiler",
+            "address": "http://194.94.239.78:5000/spannungsteiler",
+            "interestedIn": topic
+        })
     ui_app.run()
