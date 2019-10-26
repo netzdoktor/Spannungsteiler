@@ -1,9 +1,15 @@
 from flask import Flask, escape, request
 import threading, json, time
 from spannungsteiler.util import broker_util
-import socket
+import socket, logging
 
+
+
+mutex= threading.Lock()
 app = Flask(__name__)
+log = logging.getLogger('werkzeug')
+log.disabled = True
+
 energy_requested = {}
 energy_provided = {}
 
@@ -16,11 +22,18 @@ def get_local_ip():
     return ip
 
 def subscribe_to_topics():
-    broker_util.send("subscribe", {
-        "sender": "energy_bank",
-        "address": "http://{}:5000/energy_bank".format(get_local_ip()),
-        "interestedIn": ""
-    })
+
+    topics = [
+        "spannungsteiler_demand_publish",
+        "spannungsteiler_offer_publish"
+    ]
+
+    for i in topics:
+        broker_util.send("subscribe", {
+            "sender": "energy_bank",
+            "address": "http://{}:5000/energy_bank".format(get_local_ip()),
+            "interestedIn": i
+        })
 
 def start_server():
     app = Flask(__name__)
@@ -28,21 +41,27 @@ def start_server():
     @app.route('/energy_bank', methods=["POST"])
     def endpoint():
 
-        payload = request.json
-        amount = payload["payload"]["amount"]
+
+        payload = request.json["event"]
+        if "demand" in payload["payload"]:
+            amount = payload["payload"]["demand"]
+        else:
+            amount = payload["payload"]["offer"]
+
         sender_id = payload["id"]
 
+        mutex.acquire()
         if amount < 0:
             energy_requested[sender_id] = amount
         elif amount > 0:
             energy_provided[sender_id] = amount
 
+        mutex.release()
         return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
 
-
-        t = threading.Thread(target=app.run, kwargs={"host": "0.0.0.0"})
-        t.daemon = False
-        t.start()
+    t = threading.Thread(target=app.run, kwargs={"host": "0.0.0.0"})
+    t.daemon = False
+    t.start()
 
 
 if __name__ == "__main__":
@@ -52,18 +71,18 @@ if __name__ == "__main__":
     start_server()
 
     while True:
+        mutex.acquire()
+
 
         provided_sum = 0
         requested_sum = 0
 
-        for key in energy_provided.keys():
-            provided_sum += energy_provided.get(key)
+        provided_sum = sum(energy_provided.values())
 
-        for key in energy_requested.keys():
-            requested_sum += energy_requested.get(key)
+        requested_sum = sum(energy_requested.values())
 
-        for key in energy_provided.keys():
-            amount = energy_provided.get(key)
+
+        for (amount, key) in enumerate(energy_provided):
             answere = 0
 
             if amount <= abs(requested_sum):
@@ -76,8 +95,7 @@ if __name__ == "__main__":
             requested_sum -= answere
 
 
-        for key in energy_requested.keys():
-            amount = energy_requested.get(key)
+        for (key, amount) in enumerate(energy_requested):
             answere = 0
 
             if abs(amount) <= provided_sum:
@@ -89,6 +107,6 @@ if __name__ == "__main__":
             broker_util.send_transaction_execution("energy_bank", answere, key)
             provided_sum -= answere      
         
-
-        time.sleep(0.3)
+        mutex.release()
+        time.sleep(1)
 
