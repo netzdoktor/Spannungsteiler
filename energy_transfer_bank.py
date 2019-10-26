@@ -55,6 +55,9 @@ def start_server():
             energy_requested[sender_id] = amount
         elif amount > 0:
             energy_provided[sender_id] = amount
+        else:
+            mutex.release()
+            return ""
 
         mutex.release()
         return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
@@ -108,5 +111,5 @@ if __name__ == "__main__":
             provided_sum -= answere      
         
         mutex.release()
-        time.sleep(1)
+        time.sleep(0.6)
 
