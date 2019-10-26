@@ -11,7 +11,7 @@ class Household():
         self.user = user
         self.buffer = 1.0
         self.buffer_target = 0.0
-        self.buffer_capacity = 500
+        self.buffer_capacity = 10000
         self.production = 0
         self.consumption = 0
         dataframe = pd.read_excel(file)
