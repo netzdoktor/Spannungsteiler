@@ -22,7 +22,7 @@ class UserLightStatus():
 
     def update_user(self, id, color):
         self.users[id].update_color(color)
-        self.update_lights()
+        #self.update_lights()
 
     def update_lights(self):
         lights = list(itertools.chain([x.lights for x in self.users]))

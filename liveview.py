@@ -41,13 +41,11 @@ class LiveView(Widget):
 
         return callback
 
-
-
-    def update(self, json):
+    def update(self, json, type):
         payload = json["event"]["payload"]
-        print(json)
+        print(payload)
         date = str_to_quarter_no(payload["timestamp"])
-        value = payload["demand"]
+        value = payload[type]
         self.plot.points[date] = (date, value)
 
 

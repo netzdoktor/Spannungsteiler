@@ -14,13 +14,13 @@ from color_util import UserLightStatus
 class SpannungsteilerApp(App):
     def build_graphs(self):
         layout = GridLayout(cols=1, row_force_default=True, row_default_height=150, size_hint_y=1)
-        self.liveview1 = LiveView(xlabel='Time', ylabel='Supply [W]', ymax=3,y_ticks_major=1,)
+        self.liveview_offer = LiveView(xlabel='Time', ylabel='Offer [W]', ymax=1750,y_ticks_major=500,)
         self.liveview_demand = LiveView(xlabel='Time', ylabel='Demand [W]', ymax=1050,y_ticks_major=500,)
-        self.liveview3 = LiveView(xlabel='Time', ylabel='Fill [%]', ymax=1,y_ticks_major=1,)
+        self.liveview_battery = LiveView(xlabel='Time', ylabel='Fill [%]', ymax=100,y_ticks_major=25)
 
-        layout.add_widget(self.liveview1.graph)
+        layout.add_widget(self.liveview_offer.graph)
         layout.add_widget(self.liveview_demand.graph)
-        layout.add_widget(self.liveview3.graph)
+        layout.add_widget(self.liveview_battery.graph)
         return layout
 
     def build_actions(self):
@@ -61,7 +61,11 @@ class SpannungsteilerApp(App):
 
         self.user_status_lights.update_user(0, color)
         if json["event"]["type"] == "spannungsteiler_demand_publish":
-            self.liveview_demand.update(json)
+            self.liveview_demand.update(json, "demand")
+        elif json["event"]["type"] == "spannungsteiler_fill_level_publish":
+            self.liveview_battery.update(json, "fill_level")
+        elif json["event"]["type"] == "spannungsteiler_offer_publish":
+            self.liveview_offer.update(json, "offer")
         else:
             pass
 
@@ -72,6 +76,7 @@ if __name__ == '__main__':
     @app.route('/spannungsteiler', methods=["POST"])
     def endpoint():
         if request.json["event"]["sender"] != "spannungsteiler":
+            print(request.json)
             ui_app.update(request.json)
         return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
 
@@ -82,6 +87,6 @@ if __name__ == '__main__':
     broker_util.send("subscribe", {
         "sender": "spannungsteiler",
         "address": "http://194.94.239.78:5000/spannungsteiler",
-        "interestedIn": "spannungsteiler_demand_publish"
+        "interestedIn": "spannungsteiler_offer_publish"
     })
     ui_app.run()

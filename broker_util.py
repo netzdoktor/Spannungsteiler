@@ -30,7 +30,7 @@ def send_demand(sender, timestamp, value):
         "payload": {
             "timestamp": timestamp,
             "demand": value
-        } 
+        }
     }
 
     send("publish", payload)
