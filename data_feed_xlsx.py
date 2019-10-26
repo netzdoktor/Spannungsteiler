@@ -32,4 +32,4 @@ for index, row in dataframe.iterrows():
         broker_util.send_fill_level(USERID, timestamp, value)
     elif TYPE is 'user':
         broker_util.send_demand(USERID, timestamp, value)
-    time.sleep(0.03)
+    time.sleep(0.3)
