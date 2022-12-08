@@ -12,7 +12,7 @@ url = "https://kivy-garden.github.io/simple/"
 [packages]
 kivy = "==1.11.1"
 kivy-garden = "==0.1.4"
-certifi = "==2019.9.11"
+certifi = "==2022.12.7"
 chardet = "==3.0.4"
 docutils = "==0.15.2"
 flask = "*"
